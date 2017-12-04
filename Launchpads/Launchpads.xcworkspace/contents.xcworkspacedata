@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:/Users/alexeygross/Dropbox/Code/Swift/IntermediaTestTask/IntermediaTest/Launchpads/Launchpads.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:Launchpads.xcodeproj">
+   </FileRef>
+</Workspace>

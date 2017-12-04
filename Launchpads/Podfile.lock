@@ -1,0 +1,30 @@
+PODS:
+  - Alamofire (4.5.0)
+  - ModelMapper (7.3.0)
+  - Realm (3.0.2):
+    - Realm/Headers (= 3.0.2)
+  - Realm/Headers (3.0.2)
+  - RealmSwift (3.0.2):
+    - Realm (= 3.0.2)
+  - RxCocoa (4.0.0):
+    - RxSwift (~> 4.0)
+  - RxSwift (4.0.0)
+
+DEPENDENCIES:
+  - Alamofire (~> 4.5)
+  - ModelMapper
+  - RealmSwift
+  - RxCocoa (~> 4.0)
+  - RxSwift (~> 4.0)
+
+SPEC CHECKSUMS:
+  Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
+  ModelMapper: b70d373f224fc8cfc4da67b483db163a6cd05fe6
+  Realm: 6f23fd1f178a09342eac21bfa7c2bf4312a7a180
+  RealmSwift: 695393add1b8f9d5fa75dd16e6355cf3935f71e2
+  RxCocoa: d62846ca96495d862fa4c59ea7d87e5031d7340e
+  RxSwift: fd680d75283beb5e2559486f3c0ff852f0d35334
+
+PODFILE CHECKSUM: 76079ded93ef88036ee499b28876d06aaf019aed
+
+COCOAPODS: 1.2.1
