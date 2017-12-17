@@ -12,18 +12,18 @@ class LaunchpadDetailController: UIViewController {
     
     // MARK: - Properties
     
-    var launchpad: Launchpad?
-    var launchpadDetailCellId: String!
-    var launchpadDetailTypes: NSMutableArray!
+    var _launchpad: Launchpad?
+    var _launchpadDetailCellId: String!
+    var _launchpadDetailTypes: NSMutableArray!
     
-    var launchpadDetailView: LaunchpadDetailView!
+    var _launchpadDetailView: LaunchpadDetailView!
     
     // MARK: - Initialization
 
     public init(aLaunchpad: Launchpad) {
         super.init(nibName: nil, bundle: nil)
         
-        launchpad = aLaunchpad
+        _launchpad = aLaunchpad
         self.commonInit()
     }
     
@@ -33,23 +33,23 @@ class LaunchpadDetailController: UIViewController {
     
     private func commonInit() {
         
-        title = launchpad?.fullName
+        title = _launchpad?.fullName
         
-        launchpadDetailTypes = NSMutableArray()
-        launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.location)
-        launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.region)
-        launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.details)
+        _launchpadDetailTypes = NSMutableArray()
+        _launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.location)
+        _launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.region)
+        _launchpadDetailTypes.add(TypeConstants.LaunchpadDetailType.details)
         
-        launchpadDetailCellId = "launchpadDetailCellId"
+        _launchpadDetailCellId = "launchpadDetailCellId"
         
-        launchpadDetailView = LaunchpadDetailView()
-        launchpadDetailView.tableView.register(LaunchpadDetailCell.self, forCellReuseIdentifier: launchpadDetailCellId)
+        _launchpadDetailView = LaunchpadDetailView()
+        _launchpadDetailView.tableView.register(LaunchpadDetailCell.self, forCellReuseIdentifier: _launchpadDetailCellId)
     }
     
     // MARK: - Life cycle
     
     override func loadView() {
-        view = launchpadDetailView
+        view = _launchpadDetailView
     }
     
     override func viewDidLoad() {
@@ -62,15 +62,15 @@ class LaunchpadDetailController: UIViewController {
     
     private func reloadTableView() {
         
-        if (launchpadDetailView.tableView.delegate == nil) {
-            self.launchpadDetailView.tableView.delegate = self
+        if (_launchpadDetailView.tableView.delegate == nil) {
+            _launchpadDetailView.tableView.delegate = self
         }
         
-        if (launchpadDetailView.tableView.dataSource == nil) {
-            self.launchpadDetailView.tableView.dataSource = self
+        if (_launchpadDetailView.tableView.dataSource == nil) {
+            _launchpadDetailView.tableView.dataSource = self
         }
         
-        self.launchpadDetailView.tableView.reloadData()
+        _launchpadDetailView.tableView.reloadData()
     }
 }
 
@@ -83,23 +83,23 @@ extension LaunchpadDetailController: UITableViewDataSource, UITableViewDelegate 
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return launchpadDetailTypes.count
+        return _launchpadDetailTypes.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell: LaunchpadDetailCell = tableView.dequeueReusableCell(withIdentifier: launchpadDetailCellId, for: indexPath) as! LaunchpadDetailCell
+        let cell: LaunchpadDetailCell = tableView.dequeueReusableCell(withIdentifier: _launchpadDetailCellId, for: indexPath) as! LaunchpadDetailCell
         
-        if let aLaunchpad: Launchpad = launchpad {
+        if let launchpad = _launchpad {
             
             if (TypeConstants.LaunchpadDetailType(rawValue: indexPath.row) == TypeConstants.LaunchpadDetailType.location) {
-                cell.update(launchpad: aLaunchpad, type:TypeConstants.LaunchpadDetailType.location)
+                cell.update(launchpad: launchpad, type:TypeConstants.LaunchpadDetailType.location)
                 
             } else if (TypeConstants.LaunchpadDetailType(rawValue: indexPath.row) == TypeConstants.LaunchpadDetailType.region) {
-                cell.update(launchpad: aLaunchpad, type: TypeConstants.LaunchpadDetailType.region)
+                cell.update(launchpad: launchpad, type: TypeConstants.LaunchpadDetailType.region)
                 
             } else if (TypeConstants.LaunchpadDetailType(rawValue: indexPath.row) == TypeConstants.LaunchpadDetailType.details) {
-                cell.update(launchpad: aLaunchpad, type: TypeConstants.LaunchpadDetailType.details)
+                cell.update(launchpad: launchpad, type: TypeConstants.LaunchpadDetailType.details)
                 
             }
         }
@@ -116,7 +116,7 @@ extension LaunchpadDetailController: UITableViewDataSource, UITableViewDelegate 
         } else {
             // Details: could be more than one line
             
-            let contentHeight: CGFloat = (launchpad?.details.height(withConstrainedWidth: UIScreen.main.bounds.size.width - LaunchpadDetailCell.sideOffset * 2, font: LaunchpadDetailCell.contentFont))!
+            let contentHeight: CGFloat = (_launchpad?.details.height(withConstrainedWidth: UIScreen.main.bounds.size.width - LaunchpadDetailCell.sideOffset * 2, font: LaunchpadDetailCell.contentFont))!
             let titleString: String = LaunchpadDetailCell.titleForType(type: TypeConstants.LaunchpadDetailType(rawValue: indexPath.row)!)
             let titleHeight: CGFloat = titleString.height(withConstrainedWidth: UIScreen.main.bounds.size.width - LaunchpadDetailCell.sideOffset * 2, font: LaunchpadDetailCell.headerFont)
             

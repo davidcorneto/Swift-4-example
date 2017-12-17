@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>baseUrl</key>
-	<string>https://api.spacexdata.com/v1/</string>
+	<string>https://api.spacexdata.com/v2/</string>
 	<key>launchpads</key>
 	<string>launchpads</string>
 </dict>

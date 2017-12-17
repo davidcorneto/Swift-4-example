@@ -12,8 +12,8 @@ import RxSwift
 
 class WebServiceManager: NSObject {
     
-    let baseURL: String?
-    let launchpadPath: String?
+    let _baseURL: String!
+    let _launchpadPath: String!
     
     // MARK: - Initializers
     
@@ -26,11 +26,11 @@ class WebServiceManager: NSObject {
         }
         
         if let urlsDict = urls {
-            baseURL = urlsDict["baseUrl"] as? String
-            launchpadPath = urlsDict["launchpads"] as? String
+            _baseURL = urlsDict["baseUrl"] as? String
+            _launchpadPath = urlsDict["launchpads"] as? String
         } else {
-            baseURL = "https://api.spacexdata.com/"
-            launchpadPath = "launchpads"
+            _baseURL = "https://api.spacexdata.com"
+            _launchpadPath = "/v2/launchpads"
         }
         
         super.init()
@@ -39,10 +39,10 @@ class WebServiceManager: NSObject {
     // MARK: - Web calls
     
     // Using blocks
-    func getLaunchpads(completion: @escaping (_ result: (NSMutableArray)) -> Void) {
+    func getLaunchpads(completion: @escaping (_ result: NSMutableArray) -> Void) {
         
         let launchpads: NSMutableArray = NSMutableArray()
-        let launchpadsUrlString: String = "\(String(describing: baseURL!))\(String(describing: launchpadPath!))"
+        let launchpadsUrlString: String = _baseURL + _launchpadPath
         
         Alamofire.request(launchpadsUrlString, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { response in
             
@@ -59,11 +59,11 @@ class WebServiceManager: NSObject {
                     }
                 }
                 
-                completion((launchpads))
+                completion(launchpads)
                 
             } else {
                 
-                completion((launchpads))
+                completion(launchpads)
             }
         }
     }
@@ -71,17 +71,31 @@ class WebServiceManager: NSObject {
     // Using RxSwift
     func getLaunchpads() -> Observable<Launchpad> {
         
-        return Observable.create { observer in
+        let launchpads: NSMutableArray = NSMutableArray()
+        let launchpadsUrlString: String = _baseURL + _launchpadPath
         
-            let launchpads: NSMutableArray = NSMutableArray()
-            let launchpadsUrlString: String = "\(String(describing: self.baseURL!))\(String(describing: self.launchpadPath!))"
+        return Observable.create { observer in
             
             Alamofire.request(launchpadsUrlString, method: .get, parameters: nil, encoding: JSONEncoding.default, headers: nil).responseJSON { response in
                 
                 if let JSON = response.result.value {
                     
-                    let json_array: NSArray = JSON as! NSArray
+                    // Check for errors
+                    if (response.error != nil) {
+                        observer.onError(ErrorConstants.WebServiceManagerError.notFound)
+                        return
+                    }
                     
+                    if let json_dict = JSON as? NSDictionary {
+                        if json_dict["error"] != nil {
+                            observer.onError(ErrorConstants.WebServiceManagerError.notFound)
+                            return
+                        }
+                    }
+                    
+                    // Mapping
+                    
+                    let json_array: NSArray = JSON as! NSArray
                     for launchpad_json in json_array {
                         
                         if let launchpad_dict: NSDictionary = launchpad_json as? NSDictionary {

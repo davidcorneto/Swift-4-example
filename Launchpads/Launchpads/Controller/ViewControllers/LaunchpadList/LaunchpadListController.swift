@@ -12,20 +12,20 @@ class LaunchpadListController: UIViewController {
     
     // MARK: - Properties
     
-    var launchpads: NSArray!
-    var launchpadCellId: String!
+    var _launchpads: NSArray!
+    var _launchpadCellId: String!
     
-    var launchpadListView: LaunchpadListView!
+    var _launchpadListView = LaunchpadListView(frame: .zero)
     
-    private var webServiceManager: WebServiceManager!
-    private var databaseManager: DBManager!
+    private var _webServiceManager: WebServiceManager!
+    private var _databaseManager: DBManager!
     
     // MARK: - Initialization
     
     public init(aWebServiceManager: WebServiceManager, aDatabaseManager: DBManager) {
         
-        webServiceManager = aWebServiceManager
-        databaseManager = aDatabaseManager
+        _webServiceManager = aWebServiceManager
+        _databaseManager = aDatabaseManager
         
         super.init(nibName: nil, bundle: nil)
         commonInit()
@@ -40,18 +40,20 @@ class LaunchpadListController: UIViewController {
         
         title = "Launchpads"
         
-        launchpads = NSArray()
+        _launchpads = NSArray()
         
-        launchpadCellId = "launchpadCellId"
+        _launchpadCellId = "launchpadCellId"
         
-        launchpadListView = LaunchpadListView()
-        launchpadListView.tableView.register(LaunchpadCell.self, forCellReuseIdentifier: launchpadCellId)
+        _launchpadListView.tableView.register(LaunchpadCell.self, forCellReuseIdentifier: _launchpadCellId)
+        _launchpadListView.tableView.delegate = self
+        _launchpadListView.tableView.dataSource = self
     }
     
     // MARK: - Life cycle
     
     override func loadView() {
-        view = launchpadListView
+        super.loadView()
+        view = _launchpadListView
     }
     
     override func viewDidLoad() {
@@ -69,14 +71,14 @@ class LaunchpadListController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        self.dismissNotifications()
+        dismissNotifications()
     }
     
     // MARK: - Private methods
     
     private func getLaunchpads() {
         
-        self.databaseManager.fetchLaunchpads(completion: { (result) in
+        _databaseManager.fetchLaunchpads(completion: { [weak self] (result) in
             
             if (result.count > 0) {
                 
@@ -86,26 +88,30 @@ class LaunchpadListController: UIViewController {
                 }
                 
                 DispatchQueue.main.async {
-                    self.reloadTableView(launchPads: launchpads)
+                    self?.reloadTableView(launchpads: launchpads)
                 }
                 
             } else {
                 
                 let launchpadsTemp: NSMutableArray = NSMutableArray()
                 
-                let _ = self.webServiceManager.getLaunchpads().subscribe(onNext: { (event) in
+                let _ = self?._webServiceManager.getLaunchpads().subscribe(onNext: { (event) in
                     launchpadsTemp.add(event)
                     
                 }, onError: { (error) in
-                    // TODO: Error handling here
-                    // empty arrays, url connection errors, etc
+                    
+                    self?.showAlert(message: "Error occurred while trying to load launchpads")
                     
                 }, onCompleted: {
                     
-                    DispatchQueue.main.async {
-                        self.reloadTableView(launchPads: launchpadsTemp)
-                    }
-
+                    OperationQueue.main.addOperation ({
+                        self?.reloadTableView(launchpads: launchpadsTemp)
+                    })
+                    
+//                    DispatchQueue.main.async {
+//                        self?.reloadTableView(launchpads: launchpadsTemp)
+//                    }
+                    
                 }, onDisposed: {
                     
                 })
@@ -114,19 +120,12 @@ class LaunchpadListController: UIViewController {
         })
     }
     
-    private func reloadTableView(launchPads: NSArray) {
+    @objc private func reloadTableView(launchpads: NSArray) {
         
-        self.launchpads = launchPads
+        _launchpads = launchpads
         
-        if (launchpadListView.tableView.delegate == nil) {
-            self.launchpadListView.tableView.delegate = self
-        }
+        _launchpadListView.tableView.reloadData()
         
-        if (launchpadListView.tableView.dataSource == nil) {
-            self.launchpadListView.tableView.dataSource = self
-        }
-        
-        self.launchpadListView.tableView.reloadData()
     }
     
     private func setupNotifications() {
@@ -142,6 +141,16 @@ class LaunchpadListController: UIViewController {
         NotificationCenter.default.removeObserver(self,
                                                   name: NSNotification.Name.UIApplicationWillEnterForeground,
                                                   object: nil)
+    }
+    
+    private func showAlert(message: String) {
+        
+        DispatchQueue.main.async { [unowned self] in
+            
+            let alert = UIAlertController(title: "Something Goes Wrong", message: message, preferredStyle: UIAlertControllerStyle.alert)
+            alert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
     }
     
     // MARK: - Notification handlers
@@ -161,13 +170,13 @@ extension LaunchpadListController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return launchpads.count
+        return _launchpads.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell: LaunchpadCell = tableView.dequeueReusableCell(withIdentifier: launchpadCellId, for: indexPath) as! LaunchpadCell
-        let launchpad: Launchpad = launchpads.object(at: indexPath.row) as! Launchpad
+        let cell: LaunchpadCell = tableView.dequeueReusableCell(withIdentifier: _launchpadCellId, for: indexPath) as! LaunchpadCell
+        let launchpad: Launchpad = _launchpads.object(at: indexPath.row) as! Launchpad
         cell.update(launchpad: launchpad)
         
         return cell
@@ -182,7 +191,7 @@ extension LaunchpadListController: UITableViewDataSource, UITableViewDelegate {
         let selectedCell: LaunchpadCell = tableView.cellForRow(at: indexPath) as! LaunchpadCell
         selectedCell.setSelected(false, animated: true)
         
-        let launchpad: Launchpad = launchpads.object(at: indexPath.row) as! Launchpad
+        let launchpad: Launchpad = _launchpads.object(at: indexPath.row) as! Launchpad
         let launchpadDetailController: LaunchpadDetailController = LaunchpadDetailController(aLaunchpad: launchpad)
         self.navigationController?.pushViewController(launchpadDetailController, animated: true)
     }

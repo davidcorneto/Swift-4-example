@@ -12,9 +12,9 @@ class LaunchpadCell: UITableViewCell {
     
     // MARK: - Properties
     
-    var mainTitleLabel: UILabel!
-    var subTitleLabel: UILabel!
-    var separatorLine: UIView!
+    var _mainTitleLabel: UILabel!
+    var _subTitleLabel: UILabel!
+    var _separatorLine: UIView!
     
     // MARK: - Initialization
     
@@ -30,44 +30,45 @@ class LaunchpadCell: UITableViewCell {
     
     private func commonInit() {
         
-        mainTitleLabel = UILabel(frame: CGRect.zero)
-        mainTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
-        mainTitleLabel.numberOfLines = 0
-        mainTitleLabel.textColor = UIColor(rgb: 0x313131)
-        addSubview(mainTitleLabel)
+        _mainTitleLabel = UILabel(frame: CGRect.zero)
+        _mainTitleLabel.font = UIFont.boldSystemFont(ofSize: 16)
+        _mainTitleLabel.numberOfLines = 0
+        _mainTitleLabel.textColor = UIColor(rgb: 0x313131)
+        addSubview(_mainTitleLabel)
         
-        subTitleLabel = UILabel(frame: CGRect.zero)
-        subTitleLabel.font = UIFont.systemFont(ofSize: 10)
-        addSubview(subTitleLabel)
+        _subTitleLabel = UILabel(frame: CGRect.zero)
+        _subTitleLabel.font = UIFont.systemFont(ofSize: 10)
+        addSubview(_subTitleLabel)
         
-        separatorLine = UIView(frame: CGRect.zero)
-        separatorLine.backgroundColor = UIColor.gray
-        addSubview(separatorLine)
+        _separatorLine = UIView(frame: CGRect.zero)
+        _separatorLine.backgroundColor = UIColor.gray
+        addSubview(_separatorLine)
     }
     
     // MARK: - update
     
     func update(launchpad: Launchpad) {
         
-        mainTitleLabel.text = launchpad.fullName
-        subTitleLabel.text = launchpad.status
+        _mainTitleLabel.text = launchpad.fullName
+        _subTitleLabel.text = launchpad.status
         
-        self.updateSubtitleColors(launchpad: launchpad)
+        updateSubtitleColors(launchpad: launchpad)
         
-        self.layoutIfNeeded()
+        setNeedsLayout()
+        layoutIfNeeded()
     }
     
     func updateSubtitleColors(launchpad: Launchpad) {
         if (launchpad.status == "retired") {
-            subTitleLabel.textColor = UIColor(rgb: 0xcf1b1b)
+            _subTitleLabel.textColor = UIColor(rgb: 0xcf1b1b)
         }
         
         if (launchpad.status == "active") {
-            subTitleLabel.textColor = UIColor(rgb: 0x19774d)
+            _subTitleLabel.textColor = UIColor(rgb: 0x19774d)
         }
         
         if (launchpad.status == "under construction") {
-            subTitleLabel.textColor = UIColor(rgb: 0x32009f)
+            _subTitleLabel.textColor = UIColor(rgb: 0x32009f)
         }
     }
     
@@ -76,30 +77,36 @@ class LaunchpadCell: UITableViewCell {
     override func layoutSubviews() {
         super.layoutSubviews()
         
-        let titleSideOffset: CGFloat = 10.0
-        let mainTitleTopOffset: CGFloat = 10.0
-        let subTitleBottomOffset: CGFloat = 5.0
         
-        let separatorLineHeight: CGFloat = 1.0 / UIScreen.main.scale
-        
-        
-        mainTitleLabel.sizeToFit()
-        mainTitleLabel.frame = CGRect(x: titleSideOffset,
-                                      y: mainTitleTopOffset,
-                                      width: self.frame.size.width - titleSideOffset * 2,
-                                      height: mainTitleLabel.frame.size.height)
+        _mainTitleLabel.sizeToFit()
+        _mainTitleLabel.frame = CGRect(x: LayoutConfigs.mainTitleLabel_sideOffset,
+                                       y: LayoutConfigs.mainTitleLabel_topOffset,
+                                       width: frame.size.width - LayoutConfigs.mainTitleLabel_sideOffset * 2,
+                                       height: _mainTitleLabel.frame.size.height)
         
         
-        subTitleLabel.sizeToFit()
-        subTitleLabel.frame = CGRect(x: mainTitleLabel.frame.origin.x,
-                                     y: self.frame.size.height - subTitleLabel.frame.size.height - subTitleBottomOffset,
-                                     width: mainTitleLabel.frame.size.width,
-                                     height: subTitleLabel.frame.size.height)
+        _subTitleLabel.sizeToFit()
+        _subTitleLabel.frame = CGRect(x: _mainTitleLabel.frame.origin.x,
+                                      y: frame.size.height - _subTitleLabel.frame.size.height - LayoutConfigs.subtitleLabel_bottomOffset,
+                                      width: _mainTitleLabel.frame.size.width,
+                                      height: _subTitleLabel.frame.size.height)
         
         
-        separatorLine.frame = CGRect(x: 0,
-                                     y: self.frame.size.height - separatorLineHeight,
-                                     width: self.frame.size.width,
-                                     height: separatorLineHeight)
+        _separatorLine.frame = CGRect(x: 0,
+                                      y: frame.size.height - LayoutConfigs.separatorLine_height,
+                                      width: frame.size.width,
+                                      height: LayoutConfigs.separatorLine_height)
+    }
+    
+    // MARK: - Layout configs
+    
+    private struct LayoutConfigs {
+        
+        static let mainTitleLabel_sideOffset: CGFloat = 10.0
+        static let mainTitleLabel_topOffset: CGFloat = 10.0
+        
+        static let subtitleLabel_bottomOffset: CGFloat = 5.0
+        
+        static let separatorLine_height: CGFloat = 1.0 / UIScreen.main.scale
     }
 }

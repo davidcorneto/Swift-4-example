@@ -28,7 +28,7 @@ class LaunchpadListView: UIView {
     
     private func commonInit() {
         
-        tableView = UITableView(frame: CGRect.zero)
+        tableView = UITableView(frame: .zero)
         tableView.separatorStyle = UITableViewCellSeparatorStyle.none
         addSubview(tableView)
     }
