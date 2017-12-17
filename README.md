@@ -1,11 +1,14 @@
 # Swift-4-example
 
+![Imgur](https://www.dropbox.com/s/iqg98ju5rjv0yhv/swift.png?raw=1)
+
 Task Description:
 Create an App that accesses the public SpaseX-API to retrieve a list of Launchpads.
 List of launchpads should be cached in the database and updated after every App launch in background.
 
 API
-GET https://api.spacexdata.com/v1/launchpads
+GET https://api.spacexdata.com/v2/launchpads
+API version could be changed
 
 UI Description
 Screen 1:
@@ -23,10 +26,8 @@ Requirements:
 1) Must use latest Xcode and Swift versions
 2) iOS 10+
 3) Need to be able to go back between screens
-
-Will be an advantage:
-1) Project architecture that allows easy app functionality expansion (adding new requests, new screens)
-2) CocoaPods as dependency management system
-3) Realm
-4) PromiseKit or RxSwift
-5) Code style, syntax sugar and best-practices
+4) Project architecture that allows easy app functionality expansion (adding new requests, new screens)
+5) CocoaPods as dependency management system
+6) Realm usage
+7) RxSwift usage
+8) Code style,  syntax sugar and best-practices
